@@ -18,4 +18,9 @@ class CreateBudget extends Command
     {
         return $this->payload()['id'];
     }
+
+    public function userId(): string
+    {
+        return $this->payload()['userId'];
+    }
 }

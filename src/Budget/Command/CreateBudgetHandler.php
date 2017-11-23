@@ -16,7 +16,11 @@ class CreateBudgetHandler
 
     public function __invoke(CreateBudget $command): void
     {
-        $budget = Budget::createWithData($command->id(), $command->name());
+        $budget = Budget::createWithData(
+            $command->id(),
+            $command->name(),
+            $command->userId()
+        );
 
         $this->repository->save($budget);
     }
