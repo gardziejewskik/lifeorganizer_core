@@ -11,6 +11,11 @@ class BudgetCreated extends AggregateChanged
         return $this->payload()['id'];
     }
 
+    public function userId(): string
+    {
+        return $this->payload()['userId'];
+    }
+
     public function name(): string
     {
         return $this->payload()['name'];

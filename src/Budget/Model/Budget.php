@@ -12,15 +12,20 @@ use Prooph\EventSourcing\AggregateChanged;
 class Budget extends AggregateRoot
 {
     private $id;
+    private $userId;
     private $name;
     private $positions = [];
 
-    public static function createWithData(string $id, string $name): self
-    {
+    public static function createWithData(
+        string $id,
+        string $name,
+        string $userId
+    ): self {
         $budget = new self;
         $budget->recordThat(BudgetCreated::occur($id, [
             'id' => $id,
             'name' => $name,
+            'userId' => $userId
         ]));
 
         return $budget;
@@ -47,10 +52,6 @@ class Budget extends AggregateRoot
         );
     }
 
-//    public function removePosition(Uuid $positionId): void
-//    {
-//    }
-
     protected function aggregateId(): string
     {
         return $this->id;
@@ -63,6 +64,7 @@ class Budget extends AggregateRoot
                 /** @var BudgetCreated $event */
                 $this->id = $event->id();
                 $this->name = $event->name();
+                $this->userId = $event->userId();
                 break;
             case NameChanged::class:
                 /** @var NameChanged $event */
@@ -77,6 +79,8 @@ class Budget extends AggregateRoot
                 );
                 $this->positions[] = $budgetPosition;
                 break;
+            default:
+                throw new UnsupportedEvent(get_class($event));
         }
     }
 }

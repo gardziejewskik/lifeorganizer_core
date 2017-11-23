@@ -21,13 +21,17 @@ class BudgetTest extends TestCase
     {
         $budgetName = "name";
         $budgetId = "id";
+        $userId = "userId";
 
-        $budget = Budget::createWithData($budgetId, $budgetName);
+        $budget = Budget::createWithData($budgetId, $budgetName, $userId);
 
         $decorator = AggregateRootDecorator::newInstance();
         $recordedEvents = $decorator->extractRecordedEvents($budget);
         $event = $recordedEvents[0];
         $this->assertInstanceOf(BudgetCreated::class, $event);
+        $this->assertEquals($budgetName, $event->payload()['name']);
+        $this->assertEquals($budgetId, $event->payload()['id']);
+        $this->assertEquals($userId, $event->payload()['userId']);
     }
 
     /**
@@ -74,6 +78,6 @@ class BudgetTest extends TestCase
 
     private function createBudget(): Budget
     {
-        return Budget::createWithData('id', 'name');
+        return Budget::createWithData('id', 'name', 'userId');
     }
 }

@@ -23,6 +23,7 @@
     "prooph/service-bus": "^6.0",
     "prooph/snapshotter": "^2.0",
     "moneyphp/money": "^3.0",
-    "phpunit/phpunit": "^6.4"
+    "phpunit/phpunit": "^6.4",
+    "lifeorganizer/core": "*"
   }
 }
