@@ -3,7 +3,6 @@
 namespace LifeOrganizer\Core;
 
 use LifeOrganizer\Core\Budget\Model\Budget;
-use Prooph\Common\Messaging\Message;
 use Prooph\EventSourcing\AggregateChanged;
 use Prooph\EventStore\EventStore;
 use Prooph\EventStore\Projection\ReadModelProjector;
@@ -19,6 +18,8 @@ class EventProjectorHandler
      * @var EventStore
      */
     private $eventStore;
+
+    private $projectorInitialized = false;
 
     public function __construct(
         ReadModelProjector $projector,
@@ -38,7 +39,10 @@ class EventProjectorHandler
         /** @var StreamName $stream */
         $stream = $streams[0];
 
-        $this->projector->fromStream($stream);
+        if (!$this->projectorInitialized) {
+            $this->projector->fromStream($stream);
+            $this->projectorInitialized = true;
+        }
         $this->projector->run(false);
     }
 }
