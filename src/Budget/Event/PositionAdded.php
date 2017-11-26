@@ -2,9 +2,9 @@
 
 namespace LifeOrganizer\Core\Budget\Event;
 
-use Prooph\EventSourcing\AggregateChanged;
+use LifeOrganizer\Core\Budget\BudgetAggregateChanged;
 
-class PositionAdded extends AggregateChanged
+class PositionAdded extends BudgetAggregateChanged
 {
     public function positionName(): string
     {

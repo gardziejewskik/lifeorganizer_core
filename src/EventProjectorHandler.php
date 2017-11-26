@@ -2,23 +2,17 @@
 
 namespace LifeOrganizer\Core;
 
-use LifeOrganizer\Core\Budget\Model\Budget;
-use Prooph\EventSourcing\AggregateChanged;
 use Prooph\EventStore\EventStore;
 use Prooph\EventStore\Projection\ReadModelProjector;
 use Prooph\EventStore\StreamName;
 
 class EventProjectorHandler
 {
-    /**
-     * @var ReadModelProjector
-     */
     private $projector;
-    /**
-     * @var EventStore
-     */
+
     private $eventStore;
 
+    /** @var bool $projectorInitialized */
     private $projectorInitialized = false;
 
     public function __construct(
@@ -29,20 +23,26 @@ class EventProjectorHandler
         $this->eventStore = $eventStore;
     }
 
-    public function __invoke(AggregateChanged $event)
+    public function __invoke(AggregateChangedEvent $event)
     {
-        $streams = $this->eventStore->fetchStreamNames(
-            Budget::class . '-' . $event->aggregateId(),
-            null
-        );
-
-        /** @var StreamName $stream */
-        $stream = $streams[0];
+        $streamName = $this->getStreamName($event);
 
         if (!$this->projectorInitialized) {
-            $this->projector->fromStream($stream);
+            $this->projector->fromStream($streamName);
             $this->projectorInitialized = true;
         }
         $this->projector->run(false);
+    }
+
+    private function getStreamName(AggregateChangedEvent $event): StreamName
+    {
+        $streamName = $event->getAggregateClass() . '-' . $event->aggregateId();
+
+        $streamsNames = $this->eventStore->fetchStreamNames(
+            $streamName,
+            null
+        );
+
+        return $streamsNames[0];
     }
 }
