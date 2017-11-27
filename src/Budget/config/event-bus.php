@@ -3,18 +3,18 @@
 use LifeOrganizer\Core\Budget\Event\BudgetCreated;
 use LifeOrganizer\Core\Budget\Event\NameChanged;
 use LifeOrganizer\Core\Budget\Event\PositionAdded;
-use LifeOrganizer\Core\Budget\Projection\BudgetProjector;
+use LifeOrganizer\Core\EventProjectorHandler;
 
 return [
     'event-bus' => [
         BudgetCreated::class => [
-            [ BudgetProjector::class, 'onBudgetCreated' ]
+            [ EventProjectorHandler::class ]
         ],
         NameChanged::class => [
-            [ BudgetProjector::class, 'onNameChanged' ]
+            [ EventProjectorHandler::class ]
         ],
         PositionAdded::class => [
-            [ BudgetProjector::class, 'onPositionAdded' ]
+            [ EventProjectorHandler::class ]
         ],
     ]
 ];
