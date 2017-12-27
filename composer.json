@@ -13,6 +13,7 @@
       "LifeOrganizer\\Core\\": "src/"
     }
   },
+  "minimum-stability": "dev",
   "require": {
     "php": ">=7.1",
     "prooph/event-sourcing": "^5.2",
@@ -24,6 +25,6 @@
     "prooph/snapshotter": "^2.0",
     "moneyphp/money": "^3.0",
     "phpunit/phpunit": "^6.4",
-    "lifeorganizer/core": "*"
+    "react/promise": "2.5"
   }
 }

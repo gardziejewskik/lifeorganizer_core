@@ -2,6 +2,7 @@
 
 namespace LifeOrganizer\Core\Budget\Query;
 
+use React\Promise\Deferred;
 use LifeOrganizer\Core\Budget\Projection\BudgetFinder;
 
 class GetAllBudgetsHandler
@@ -13,7 +14,7 @@ class GetAllBudgetsHandler
         $this->budgetFinder = $budgetFinder;
     }
 
-    public function __invoke(GetAllBudgets $query)
+    public function __invoke(GetAllBudgets $query, Deferred $deferred = null)
     {
         return $this->budgetFinder->getAll();
     }
