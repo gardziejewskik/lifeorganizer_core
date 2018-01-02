@@ -2,6 +2,7 @@
 
 namespace LifeOrganizer\Core\Budget\Query;
 
+use React\Promise\Deferred;
 use LifeOrganizer\Core\Budget\Projection\BudgetFinder;
 
 class GetBudgetByIdHandler
@@ -12,9 +13,14 @@ class GetBudgetByIdHandler
     {
         $this->budgetFinder = $budgetFinder;
     }
-    
-    public function __invoke(GetBudgetById $query)
+
+    public function __invoke(GetBudgetById $query, Deferred $deferred = null)
     {
-        return $this->budgetFinder->getById($query->getBudgetId());
+        $budget = $this->budgetFinder->getById($query->getBudgetId());
+        if (is_null($deferred)) {
+            return $budget;
+        }
+
+        $deferred->resolve($budget);
     }
 }

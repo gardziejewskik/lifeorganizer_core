@@ -16,6 +16,11 @@ class GetAllBudgetsHandler
 
     public function __invoke(GetAllBudgets $query, Deferred $deferred = null)
     {
-        return $this->budgetFinder->getAll();
+        $budgets = $this->budgetFinder->getAll();
+        if (is_null($deferred)) {
+            return $budgets;
+        }
+
+        $deferred->resolve($budgets);
     }
 }
