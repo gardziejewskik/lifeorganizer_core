@@ -6,26 +6,30 @@ use LifeOrganizer\Core\Budget\Event\BudgetCreated;
 use LifeOrganizer\Core\Budget\Event\NameChanged;
 use LifeOrganizer\Core\Budget\Event\PositionAdded;
 use LifeOrganizer\Core\Budget\ValueObject\PositionDetails;
-use Prooph\EventSourcing\AggregateRoot;
+use LifeOrganizer\Core\Category\Category;
 use Prooph\EventSourcing\AggregateChanged;
+use Prooph\EventSourcing\AggregateRoot;
 
 class Budget extends AggregateRoot
 {
     private $id;
     private $userId;
+    private $category;
     private $name;
     private $positions = [];
 
     public static function createWithData(
         string $id,
         string $name,
-        string $userId
+        string $userId,
+        Category $category
     ): self {
         $budget = new self;
         $budget->recordThat(BudgetCreated::occur($id, [
             'id' => $id,
             'name' => $name,
-            'userId' => $userId
+            'userId' => $userId,
+            'category' => $category
         ]));
 
         return $budget;
@@ -57,6 +61,10 @@ class Budget extends AggregateRoot
         return $this->id;
     }
 
+    /**
+     * @param AggregateChanged $event
+     * @throws UnsupportedEvent
+     */
     protected function apply(AggregateChanged $event): void
     {
         switch (get_class($event)) {
@@ -65,6 +73,7 @@ class Budget extends AggregateRoot
                 $this->id = $event->id();
                 $this->name = $event->name();
                 $this->userId = $event->userId();
+                $this->category = $event->category();
                 break;
             case NameChanged::class:
                 /** @var NameChanged $event */
