@@ -19,6 +19,6 @@ interface CategoryRepository
      * @return Category
      */
     public function getById(string $id): Category;
-
     public function exist(string $id): bool;
+    public function getAll(): array;
 }
