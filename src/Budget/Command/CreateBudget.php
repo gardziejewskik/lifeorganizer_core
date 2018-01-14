@@ -42,9 +42,9 @@ class CreateBudget extends Command
         return $this->payload()['measureUnitId'];
     }
 
-    public function categoryId(): Category
+    public function category(): Category
     {
-        return $this->payload()['categoryId'];
+        return $this->payload()['category'];
     }
 
     public function beginOfUsage(): DateTime

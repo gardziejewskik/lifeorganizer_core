@@ -56,7 +56,17 @@ class Budget extends AggregateRoot
         );
     }
 
+    public function positions()
+    {
+        return $this->positions;
+    }
+
     protected function aggregateId(): string
+    {
+        return $this->id;
+    }
+
+    public function id(): string
     {
         return $this->id;
     }

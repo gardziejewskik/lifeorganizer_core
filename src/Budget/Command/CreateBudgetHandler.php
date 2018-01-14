@@ -9,14 +9,14 @@ use LifeOrganizer\Core\Category\CategoryRepository;
 
 class CreateBudgetHandler
 {
-    private $repository;
+    private $budgetRepository;
     private $categoryRepository;
 
     public function __construct(
         BudgetRepository $budgetRepository,
         CategoryRepository $categoryRepository
     ) {
-        $this->repository = $budgetRepository;
+        $this->budgetRepository = $budgetRepository;
         $this->categoryRepository = $categoryRepository;
     }
 
@@ -26,16 +26,16 @@ class CreateBudgetHandler
      */
     public function __invoke(CreateBudget $command): void
     {
-        $this->checkCategory($command->categoryId());
+        $this->checkCategory($command->category()->id());
 
         $budget = Budget::createWithData(
             $command->id(),
             $command->name(),
             $command->userId(),
-            $this->categoryRepository->getById($command->categoryId())
+            $command->category()
         );
 
-        $this->repository->save($budget);
+        $this->budgetRepository->save($budget);
     }
 
     /**

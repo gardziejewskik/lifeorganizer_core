@@ -1,12 +1,13 @@
 <?php
 
-namespace tests\Budget\Model;
+namespace Test\Budget\Model;
 
 use LifeOrganizer\Core\Budget\Event\BudgetCreated;
 use LifeOrganizer\Core\Budget\Event\NameChanged;
 use LifeOrganizer\Core\Budget\Event\PositionAdded;
 use LifeOrganizer\Core\Budget\Model\Budget;
 use LifeOrganizer\Core\Budget\ValueObject\PositionDetails;
+use LifeOrganizer\Core\Category\Category;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
@@ -22,8 +23,14 @@ class BudgetTest extends TestCase
         $budgetName = "name";
         $budgetId = "id";
         $userId = "userId";
+        $category = new Category('1', '1');
 
-        $budget = Budget::createWithData($budgetId, $budgetName, $userId);
+        $budget = Budget::createWithData(
+            $budgetId,
+            $budgetName,
+            $userId,
+            $category
+        );
 
         $decorator = AggregateRootDecorator::newInstance();
         $recordedEvents = $decorator->extractRecordedEvents($budget);
@@ -78,6 +85,11 @@ class BudgetTest extends TestCase
 
     private function createBudget(): Budget
     {
-        return Budget::createWithData('id', 'name', 'userId');
+        return Budget::createWithData(
+            'id',
+            'name',
+            'userId',
+            new Category('1', '1')
+        );
     }
 }

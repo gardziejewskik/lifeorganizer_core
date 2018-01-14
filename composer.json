@@ -10,7 +10,8 @@
   ],
   "autoload": {
     "psr-4": {
-      "LifeOrganizer\\Core\\": "src/"
+      "LifeOrganizer\\Core\\": "src/",
+      "Test\\": "tests/"
     }
   },
   "minimum-stability": "dev",
