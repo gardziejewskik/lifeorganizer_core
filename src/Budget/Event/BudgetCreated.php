@@ -3,7 +3,6 @@
 namespace LifeOrganizer\Core\Budget\Event;
 
 use LifeOrganizer\Core\Budget\BudgetAggregateChanged;
-use LifeOrganizer\Core\Category\Category;
 
 class BudgetCreated extends BudgetAggregateChanged
 {
@@ -22,7 +21,7 @@ class BudgetCreated extends BudgetAggregateChanged
         return $this->payload()['name'];
     }
 
-    public function categoryId(): Category
+    public function categoryId(): string
     {
         return $this->payload()['categoryId'];
     }
