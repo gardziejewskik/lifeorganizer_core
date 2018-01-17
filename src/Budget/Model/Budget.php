@@ -14,7 +14,7 @@ class Budget extends AggregateRoot
 {
     private $id;
     private $userId;
-    private $category;
+    private $categoryId;
     private $name;
     private $positions = [];
 
@@ -83,7 +83,7 @@ class Budget extends AggregateRoot
                 $this->id = $event->id();
                 $this->name = $event->name();
                 $this->userId = $event->userId();
-                $this->category = $event->category();
+                $this->categoryId = $event->categoryId();
                 break;
             case NameChanged::class:
                 /** @var NameChanged $event */
