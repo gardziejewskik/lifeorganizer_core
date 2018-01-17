@@ -29,7 +29,7 @@ class Budget extends AggregateRoot
             'id' => $id,
             'name' => $name,
             'userId' => $userId,
-            'category' => $category
+            'categoryId' => $category->id()
         ]));
 
         return $budget;
