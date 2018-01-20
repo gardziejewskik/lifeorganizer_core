@@ -57,6 +57,7 @@ class BudgetReadModelProjector
                     'positionAdded',
                     [
                         'budgetId' => $event->aggregateId(),
+                        'name' => $event->positionName(),
                         'positionValue' => $event->positionValue()
                     ]
                 );
