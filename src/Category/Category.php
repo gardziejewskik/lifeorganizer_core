@@ -22,4 +22,9 @@ final class Category
     {
         return $this->name;
     }
+
+    public function changeName(string $newName): void
+    {
+        $this->name = $newName;
+    }
 }
