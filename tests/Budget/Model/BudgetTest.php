@@ -24,12 +24,14 @@ class BudgetTest extends TestCase
         $budgetId = "id";
         $userId = "userId";
         $category = new Category('1', '1');
+        $plannedValue = new Money(123, new Currency('PLN'));
 
         $budget = Budget::createWithData(
             $budgetId,
             $budgetName,
             $userId,
-            $category
+            $category,
+            $plannedValue
         );
 
         $decorator = AggregateRootDecorator::newInstance();
@@ -89,7 +91,8 @@ class BudgetTest extends TestCase
             'id',
             'name',
             'userId',
-            new Category('1', '1')
+            new Category('1', '1'),
+            new Money(123, new Currency('PLN'))
         );
     }
 }

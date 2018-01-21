@@ -5,6 +5,7 @@ namespace LifeOrganizer\Core\Budget\Model;
 use LifeOrganizer\Core\Budget\Event\BudgetCreated;
 use LifeOrganizer\Core\Budget\Event\NameChanged;
 use LifeOrganizer\Core\Budget\Event\PositionAdded;
+use LifeOrganizer\Core\Budget\Event\PositionDeleted;
 use LifeOrganizer\Core\Budget\ValueObject\PositionDetails;
 use LifeOrganizer\Core\Category\Category;
 use Money\Money;
@@ -60,6 +61,16 @@ class Budget extends AggregateRoot
         );
     }
 
+    public function deletePosition(PositionDetails $positionDetails): void
+    {
+        $this->recordThat(
+            PositionDeleted::occur(
+                $this->id,
+                $positionDetails->asArray()
+            )
+        );
+    }
+
     public function positions()
     {
         return $this->positions;
@@ -102,6 +113,17 @@ class Budget extends AggregateRoot
                     $event->positionName()
                 );
                 $this->positions[] = $budgetPosition;
+                break;
+            case PositionDeleted::class:
+                /** @var PositionDeleted $event */
+                $budgetPosition = new BudgetPosition(
+                    $this->aggregateId(),
+                    $event->positionValue(),
+                    $event->positionName()
+                );
+
+                $keyPositionToDelete = array_search($budgetPosition, $this->positions);
+                unset($this->positions[$keyPositionToDelete]);
                 break;
             default:
                 throw new UnsupportedEvent(get_class($event));

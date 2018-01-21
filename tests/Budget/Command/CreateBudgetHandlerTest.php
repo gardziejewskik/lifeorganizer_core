@@ -7,6 +7,8 @@ use LifeOrganizer\Core\Budget\Command\CreateBudget;
 use LifeOrganizer\Core\Budget\Command\CreateBudgetHandler;
 use LifeOrganizer\Core\Category\Category;
 use LifeOrganizer\Core\Category\CategoryRepository;
+use Money\Currency;
+use Money\Money;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
@@ -23,7 +25,8 @@ class CreateBudgetHandlerTest extends TestCase
             'id' => Uuid::fromString($uuid),
             'name' => 'testBudget',
             'category' => new Category('1', '1'),
-            'userId' => '1'
+            'userId' => '1',
+            'plannedValue' => new Money(123, new Currency('PLN'))
         ]);
 
         $budgetRepositoryMock = $this->createMock(
