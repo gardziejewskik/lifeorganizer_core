@@ -21,4 +21,7 @@ interface CategoryRepository
     public function getById(string $id): Category;
     public function exist(string $id): bool;
     public function getAll(): array;
+    public function add(Category $category): void;
+    public function update(Category $category): void;
+    public function delete(Category $category): void;
 }
