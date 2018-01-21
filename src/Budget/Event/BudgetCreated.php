@@ -21,6 +21,11 @@ class BudgetCreated extends BudgetAggregateChanged
         return $this->payload()['name'];
     }
 
+    public function plannedValue(): string
+    {
+        return $this->payload()['plannedValue'];
+    }
+
     public function categoryId(): string
     {
         return $this->payload()['categoryId'];

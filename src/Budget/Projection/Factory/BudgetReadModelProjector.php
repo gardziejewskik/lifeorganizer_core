@@ -39,6 +39,8 @@ class BudgetReadModelProjector
                         'id' => $event->id(),
                         'name' => $event->name(),
                         'userId' => $event->userId(),
+                        'categoryId' => $event->categoryId(),
+                        'plannedValue' => $event->plannedValue(),
                     ]
                 );
             },
