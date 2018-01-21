@@ -32,6 +32,11 @@ class CreateBudget extends Command
         return $this->payload()['value'];
     }
 
+    public function plannedValue(): Money
+    {
+        return $this->payload()['plannedValue'];
+    }
+
     public function amount(): int
     {
         return $this->payload()['amount'];

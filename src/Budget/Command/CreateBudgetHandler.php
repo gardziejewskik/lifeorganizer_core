@@ -32,7 +32,8 @@ class CreateBudgetHandler
             $command->id(),
             $command->name(),
             $command->userId(),
-            $command->category()
+            $command->category(),
+            $command->plannedValue()
         );
 
         $this->budgetRepository->save($budget);
