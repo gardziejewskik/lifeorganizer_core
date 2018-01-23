@@ -3,8 +3,11 @@
 namespace LifeOrganizer\Core\Budget\Projection\Factory;
 
 use LifeOrganizer\Core\Budget\Event\BudgetCreated;
+use LifeOrganizer\Core\Budget\Event\BudgetDeleted;
 use LifeOrganizer\Core\Budget\Event\NameChanged;
 use LifeOrganizer\Core\Budget\Event\PositionAdded;
+use LifeOrganizer\Core\Budget\Event\PositionDeleted;
+use LifeOrganizer\Core\Budget\Event\PositionEdited;
 use LifeOrganizer\Core\Budget\ReadModel\BudgetReadModel;
 use Prooph\EventStore\Projection\ProjectionManager;
 use Prooph\EventStore\Projection\ReadModel;
@@ -44,6 +47,14 @@ class BudgetReadModelProjector
                     ]
                 );
             },
+            BudgetDeleted::class => function ($state, BudgetDeleted $event) {
+                $readModel = $this->readModel();
+                $readModel->stack('deleteReadModel',
+                    [
+                        'id' => $event->aggregateId()
+                    ]
+                );
+            },
             NameChanged::class => function ($state, NameChanged $event) {
                 $readModel = $this->readModel();
                 $readModel->stack(
@@ -57,6 +68,34 @@ class BudgetReadModelProjector
                 $readModel = $this->readModel();
                 $readModel->stack(
                     'positionAdded',
+                    [
+                        'budgetId' => $event->aggregateId(),
+                        'name' => $event->positionName(),
+                        'positionValue' => $event->positionValue()
+                    ]
+                );
+            },
+            PositionEdited::class => function ($state, PositionEdited $event) {
+                $readModel = $this->readModel();
+                $readModel->stack(
+                    'positionEdited',
+                    [
+                        'budgetId' => $event->aggregateId(),
+                        'old' => [
+                            'value' => $event->oldPositionValue(),
+                            'name' => $event->oldPositionName()
+                        ],
+                        'new' => [
+                            'value' => $event->newPositionValue(),
+                            'name' => $event->newPositionName()
+                        ]
+                    ]
+                );
+            },
+            PositionDeleted::class => function ($state, PositionDeleted $event) {
+                $readModel = $this->readModel();
+                $readModel->stack(
+                    'positionDeleted',
                     [
                         'budgetId' => $event->aggregateId(),
                         'name' => $event->positionName(),
