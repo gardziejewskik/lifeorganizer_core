@@ -6,6 +6,7 @@ use LifeOrganizer\Core\Budget\Event\BudgetCreated;
 use LifeOrganizer\Core\Budget\Event\NameChanged;
 use LifeOrganizer\Core\Budget\Event\PositionAdded;
 use LifeOrganizer\Core\Budget\Event\PositionDeleted;
+use LifeOrganizer\Core\Budget\Event\PositionEdited;
 use LifeOrganizer\Core\Budget\ValueObject\PositionDetails;
 use LifeOrganizer\Core\Category\Category;
 use Money\Money;
@@ -57,6 +58,21 @@ class Budget extends AggregateRoot
             PositionAdded::occur(
                 $this->id,
                 $positionDetails->asArray()
+            )
+        );
+    }
+
+    public function editPosition(
+        PositionDetails $oldPositionDetails,
+        PositionDetails $newPositionDetails
+    ): void {
+        $this->recordThat(
+            PositionEdited::occur(
+                $this->id,
+                [
+                    'old' => $oldPositionDetails->asArray(),
+                    'new' => $newPositionDetails->asArray(),
+                ]
             )
         );
     }
@@ -124,6 +140,23 @@ class Budget extends AggregateRoot
 
                 $keyPositionToDelete = array_search($budgetPosition, $this->positions);
                 unset($this->positions[$keyPositionToDelete]);
+                break;
+            case PositionEdited::class:
+                /** @var PositionEdited $event */
+                $oldBudgetPosition = new BudgetPosition(
+                    $this->aggregateId(),
+                    $event->oldPositionValue(),
+                    $event->oldPositionName()
+                );
+
+                $newBudgetPosition = new BudgetPosition(
+                    $this->aggregateId(),
+                    $event->newPositionValue(),
+                    $event->newPositionName()
+                );
+
+                $keyPositionToEdit = array_search($oldBudgetPosition, $this->positions);
+                $this->positions[$keyPositionToEdit] = $newBudgetPosition;
                 break;
             default:
                 throw new UnsupportedEvent(get_class($event));
