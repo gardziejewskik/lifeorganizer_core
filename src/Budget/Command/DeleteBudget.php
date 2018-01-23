@@ -10,6 +10,7 @@ class DeleteBudget extends Command
 
     public function __construct(string $budgetId)
     {
+        $this->init();
         $this->payload = [
             'budgetId' => $budgetId
         ];
