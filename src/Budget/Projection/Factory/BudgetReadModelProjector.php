@@ -49,10 +49,9 @@ class BudgetReadModelProjector
             },
             BudgetDeleted::class => function ($state, BudgetDeleted $event) {
                 $readModel = $this->readModel();
-                $readModel->stack('deleteReadModel',
-                    [
-                        'id' => $event->aggregateId()
-                    ]
+                $readModel->stack(
+                    'budgetDeleted',
+                    $event->aggregateId()
                 );
             },
             NameChanged::class => function ($state, NameChanged $event) {
