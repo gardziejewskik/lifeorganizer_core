@@ -3,6 +3,7 @@
 namespace LifeOrganizer\Core\Budget\Model;
 
 use LifeOrganizer\Core\Budget\Event\BudgetCreated;
+use LifeOrganizer\Core\Budget\Event\BudgetDeleted;
 use LifeOrganizer\Core\Budget\Event\NameChanged;
 use LifeOrganizer\Core\Budget\Event\PositionAdded;
 use LifeOrganizer\Core\Budget\Event\PositionDeleted;
@@ -21,6 +22,7 @@ class Budget extends AggregateRoot
     private $name;
     private $positions = [];
     private $plannedValue;
+    private $deleted = false;
 
     public static function createWithData(
         string $id,
@@ -50,6 +52,21 @@ class Budget extends AggregateRoot
         $this->recordThat(NameChanged::occur($this->id, [
             'name' => $name
         ]));
+    }
+
+    public function delete()
+    {
+        $this->recordThat(
+            BudgetDeleted::occur(
+                $this->id,
+                [ 'budgetId' => $this->id ]
+            )
+        );
+    }
+
+    public function deleted(): bool
+    {
+        return $this->deleted;
     }
 
     public function addPosition(PositionDetails $positionDetails): void
@@ -116,6 +133,9 @@ class Budget extends AggregateRoot
                 $this->userId = $event->userId();
                 $this->categoryId = $event->categoryId();
                 $this->plannedValue = $event->plannedValue();
+                break;
+            case BudgetDeleted::class:
+                $this->deleted = true;
                 break;
             case NameChanged::class:
                 /** @var NameChanged $event */
