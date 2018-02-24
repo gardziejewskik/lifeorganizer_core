@@ -25,7 +25,9 @@
     "prooph/service-bus": "^6.0",
     "prooph/snapshotter": "^2.0",
     "moneyphp/money": "^3.0",
-    "phpunit/phpunit": "^6.4",
     "react/promise": "2.5"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^7.1@dev"
   }
 }

@@ -2,27 +2,23 @@
 
 namespace Test\Budget\Model;
 
-use LifeOrganizer\Core\Budget\Event\BudgetCreated;
-use LifeOrganizer\Core\Budget\Event\NameChanged;
-use LifeOrganizer\Core\Budget\Event\PositionAdded;
 use LifeOrganizer\Core\Budget\Model\Budget;
 use LifeOrganizer\Core\Budget\ValueObject\PositionDetails;
 use LifeOrganizer\Core\Category\Category;
 use Money\Currency;
 use Money\Money;
-use PHPUnit\Framework\TestCase;
-use Prooph\EventSourcing\EventStoreIntegration\AggregateRootDecorator;
+use Test\TestCase;
 
 class BudgetTest extends TestCase
 {
     /**
      * @test
      */
-    public function whenBudgetIsCreatedThenBudgetCreatedEventIsApplied()
+    public function whenBudgetIsCreatedThenHasDeclaredValues()
     {
-        $budgetName = "name";
-        $budgetId = "id";
-        $userId = "userId";
+        $budgetName = 'bc912b21-8b0b-4635-82df-f74a09fd69e1';
+        $budgetId = 'name';
+        $userId = 'c8090c8b-5dca-4335-a1aa-3c18214eed62';
         $category = new Category('1', '1');
         $plannedValue = new Money(123, new Currency('PLN'));
 
@@ -34,65 +30,82 @@ class BudgetTest extends TestCase
             $plannedValue
         );
 
-        $decorator = AggregateRootDecorator::newInstance();
-        $recordedEvents = $decorator->extractRecordedEvents($budget);
-        $event = $recordedEvents[0];
-        $this->assertInstanceOf(BudgetCreated::class, $event);
-        $this->assertEquals($budgetName, $event->payload()['name']);
-        $this->assertEquals($budgetId, $event->payload()['id']);
-        $this->assertEquals($userId, $event->payload()['userId']);
+        $this->assertTrue($budget->hasCategory($category));
+        $this->assertSame($plannedValue->getAmount(), $budget->planned());
     }
 
     /**
      * @test
      */
-    public function whenBudgetNameIsChangedThenBudgetNameChangedEventIsApplied()
+    public function whenBudgetNameIsChangedThenBudgetHasNewName()
     {
         $budget = $this->createBudget();
         $budgetNewName = "newName";
 
         $budget->newName($budgetNewName);
 
-        $decorator = AggregateRootDecorator::newInstance();
-        $recordedEvents = $decorator->extractRecordedEvents($budget);
-        $event = $recordedEvents[1];
-        $this->assertInstanceOf(NameChanged::class, $event);
+        $this->assertSame($budgetNewName, $budget->name());
     }
 
     /**
      * @test
+     * @dataProvider positionValueAndExpectedBudgetValue
+     * @param int[] $positionsValue
+     * @param int $expectedValue
      */
-    public function whenBudgetPositionIsAddedThenBudgetPositionAddedEventIsApplied()
-    {
+    public function whenPositionIsAddedToBudgetThenBudgetValueIsChanged(
+        array $positionsValue, int $expectedValue
+    ) {
         $budget = $this->createBudget();
-        $positionDetails = new PositionDetails(
-            'id',
-            new Money(123, new Currency('PLN')),
-            'zakupy'
-        );
 
-        $budget->addPosition($positionDetails);
+        foreach ($positionsValue as $positionValue) {
+            $budget->addPosition(
+                new PositionDetails(
+                    'bc912b21-8b0b-4635-82df-f74a09fd69e1',
+                    new Money($positionValue, new Currency('PLN')),
+                    'shopping'
+                )
+            );
+        }
 
-        $decorator = AggregateRootDecorator::newInstance();
-        $recordedEvents = $decorator->extractRecordedEvents($budget);
-        $event = $recordedEvents[1];
-        $this->assertInstanceOf(PositionAdded::class, $event);
-        $this->assertArrayHasKey('budgetId', $event->payload());
-        $this->assertEquals('id', $event->payload()['budgetId']);
-        $this->assertArrayHasKey('value', $event->payload());
-        $this->assertEquals('123', $event->payload()['value']);
-        $this->assertArrayHasKey('name', $event->payload());
-        $this->assertEquals('zakupy', $event->payload()['name']);
+        $expectedMoney = new Money($expectedValue, new Currency('PLN'));
+        $this->assertTrue($expectedMoney->equals($budget->value()));
     }
 
     private function createBudget(): Budget
     {
         return Budget::createWithData(
-            'id',
+            'bc912b21-8b0b-4635-82df-f74a09fd69e1',
             'name',
-            'userId',
+            'c8090c8b-5dca-4335-a1aa-3c18214eed62',
             new Category('1', '1'),
             new Money(123, new Currency('PLN'))
         );
+    }
+
+    public function positionValueAndExpectedBudgetValue(): array
+    {
+        return [
+            [
+                [ 123, -123],
+                0
+            ],
+            [
+                [ -123, 123],
+                0
+            ],
+            [
+                [ -123, 123, 123],
+                123
+            ],
+            [
+                [ -123, 123, -123],
+                -123
+            ],
+            [
+                [ -123, 123, 123, 123],
+                246
+            ]
+        ];
     }
 }

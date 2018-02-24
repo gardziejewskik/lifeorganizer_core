@@ -14,4 +14,9 @@ class BudgetPosition
         $this->value = $value;
         $this->name = $name;
     }
+
+    public function value(): string
+    {
+        return $this->value;
+    }
 }

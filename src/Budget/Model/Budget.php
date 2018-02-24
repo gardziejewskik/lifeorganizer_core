@@ -10,6 +10,7 @@ use LifeOrganizer\Core\Budget\Event\PositionDeleted;
 use LifeOrganizer\Core\Budget\Event\PositionEdited;
 use LifeOrganizer\Core\Budget\ValueObject\PositionDetails;
 use LifeOrganizer\Core\Category\Category;
+use Money\Currency;
 use Money\Money;
 use Prooph\EventSourcing\AggregateChanged;
 use Prooph\EventSourcing\AggregateRoot;
@@ -20,7 +21,12 @@ class Budget extends AggregateRoot
     private $userId;
     private $categoryId;
     private $name;
+
+    /**
+     * @var BudgetPosition[]
+     */
     private $positions = [];
+
     private $plannedValue;
     private $deleted = false;
 
@@ -52,6 +58,32 @@ class Budget extends AggregateRoot
         $this->recordThat(NameChanged::occur($this->id, [
             'name' => $name
         ]));
+    }
+
+    public function hasCategory(Category $category): bool
+    {
+        return $this->categoryId === $category->id();
+    }
+
+    public function planned(): string
+    {
+        return $this->plannedValue;
+    }
+
+    public function value(): Money
+    {
+        $value = new Money(0, new Currency('PLN'));
+        foreach ($this->positions() as $position) {
+            /** @var BudgetPosition $position */
+            $value = $value->add(new Money($position->value(), new Currency('PLN')));
+        }
+
+        return $value;
+    }
+
+    public function name(): string
+    {
+        return $this->name;
     }
 
     public function delete()
@@ -104,17 +136,12 @@ class Budget extends AggregateRoot
         );
     }
 
-    public function positions()
-    {
-        return $this->positions;
-    }
-
-    protected function aggregateId(): string
+    public function id(): string
     {
         return $this->id;
     }
 
-    public function id(): string
+    protected function aggregateId(): string
     {
         return $this->id;
     }
@@ -180,6 +207,13 @@ class Budget extends AggregateRoot
                 break;
             default:
                 throw new UnsupportedEvent(get_class($event));
+        }
+    }
+
+    private function positions()
+    {
+        foreach ($this->positions as $position) {
+            yield $position;
         }
     }
 }
