@@ -2,12 +2,11 @@
 
 namespace Test\Budget\Command;
 
-use LifeOrganizer\Core\Budget\BudgetRepository;
 use LifeOrganizer\Core\Budget\Command\AddBudgetPosition;
 use LifeOrganizer\Core\Budget\Command\AddBudgetPositionHandler;
+use LifeOrganizer\Core\Budget\InMemoryBudgetRepository;
 use LifeOrganizer\Core\Budget\Model\Budget;
 use LifeOrganizer\Core\Budget\ValueObject\PositionDetails;
-use LifeOrganizer\Core\Category\Category;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
@@ -27,33 +26,24 @@ class AddBudgetPositionHandlerTest extends TestCase
             $budgetUuid,
             'fancyName'
         );
-        $budget = Budget::createWithData(
-            $budgetUuid,
-            'testBudget',
-            'someId',
-            new Category('1', '1'),
-            new Money(123, new Currency('PLN'))
-        );
-
-        $budgetRepositoryMock = $this->createMock(
-            BudgetRepository::class
-        );
-        $budgetRepositoryMock->method('getById')
-            ->willReturn($budget);
-
-        /** @var BudgetRepository $budgetRepositoryMock */
-        $handler = new AddBudgetPositionHandler($budgetRepositoryMock);
+        $budget = $this->getMockBuilder(Budget::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $budget
+            ->expects($this->once())
+            ->method('addPosition')
+            ->with(
+                new PositionDetails(
+                    '6dc74fd3-42e5-4b9e-a5c1-0ef720136881',
+                    new Money(123, new Currency('PLN')),
+                    'fancyName'
+                )
+            );
+        $budget->method('id')->willReturn($budgetUuid);
+        $budget->method('deleted')->willReturn(false);
+        $budgetRepository = new InMemoryBudgetRepository([$budget]);
+        $handler = new AddBudgetPositionHandler($budgetRepository);
 
         $handler($command);
-
-        $positionDetails = new PositionDetails(
-            $budgetUuid,
-            new Money(123, new Currency('PLN')),
-            'fancyName'
-        );
-        $this->assertEquals(
-            0,
-            array_search($positionDetails, $budget->positions())
-        );
     }
 }

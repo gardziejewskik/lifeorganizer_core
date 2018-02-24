@@ -2,9 +2,9 @@
 
 namespace Test\Budget\Command;
 
-use LifeOrganizer\Core\Budget\BudgetRepository;
 use LifeOrganizer\Core\Budget\Command\DeleteBudget;
 use LifeOrganizer\Core\Budget\Command\DeleteBudgetHandler;
+use LifeOrganizer\Core\Budget\InMemoryBudgetRepository;
 use LifeOrganizer\Core\Budget\Model\Budget;
 use LifeOrganizer\Core\Category\Category;
 use Money\Currency;
@@ -27,16 +27,9 @@ class DeleteBudgetHandlerTest extends TestCase
             new Category('1', '1'),
             new Money(123, new Currency('PLN'))
         );
-
-        $budgetRepositoryMock = $this->createMock(
-            BudgetRepository::class
-        );
-        $budgetRepositoryMock->method('getById')
-            ->willReturn($budget);
-
+        $budgetRepository = new InMemoryBudgetRepository([$budget]);
         $command = new DeleteBudget($budgetUuid);
-        /** @var BudgetRepository $budgetRepositoryMock */
-        $handler = new DeleteBudgetHandler($budgetRepositoryMock);
+        $handler = new DeleteBudgetHandler($budgetRepository);
 
         $handler($command);
 

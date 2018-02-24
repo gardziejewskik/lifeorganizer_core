@@ -5,6 +5,7 @@ namespace Test\Budget\Command;
 use LifeOrganizer\Core\Budget\BudgetRepository;
 use LifeOrganizer\Core\Budget\Command\CreateBudget;
 use LifeOrganizer\Core\Budget\Command\CreateBudgetHandler;
+use LifeOrganizer\Core\Budget\InMemoryBudgetRepository;
 use LifeOrganizer\Core\Category\Category;
 use LifeOrganizer\Core\Category\CategoryRepository;
 use Money\Currency;
@@ -29,11 +30,7 @@ class CreateBudgetHandlerTest extends TestCase
             'plannedValue' => new Money(123, new Currency('PLN'))
         ]);
 
-        $budgetRepositoryMock = $this->createMock(
-            BudgetRepository::class
-        );
-        $budgetRepositoryMock->expects($this->once())
-            ->method('save');
+        $budgetRepository = new InMemoryBudgetRepository();
 
         $categoryRepositoryMock = $this->createMock(
             CategoryRepository::class
@@ -45,10 +42,12 @@ class CreateBudgetHandlerTest extends TestCase
         /** @var BudgetRepository $budgetRepositoryMock */
         /** @var CategoryRepository $categoryRepositoryMock */
         $handler = new CreateBudgetHandler(
-            $budgetRepositoryMock,
+            $budgetRepository,
             $categoryRepositoryMock
         );
 
         $handler($command);
+
+        $this->assertCount(1, $budgetRepository);
     }
 }

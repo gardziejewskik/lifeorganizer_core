@@ -19,14 +19,14 @@ class EditBudgetPositionHandler
         $budgetId = $command->payload()['budgetId'];
         $budget = $this->repository->getById($budgetId);
         $oldPositionData = new PositionDetails(
-            $command->payload()['old']['name'],
+            $budgetId,
             $command->payload()['old']['value'],
-            $budgetId
+            $command->payload()['old']['name']
         );
         $newPositionData = new PositionDetails(
-            $command->payload()['new']['name'],
+            $budgetId,
             $command->payload()['new']['value'],
-            $budgetId
+            $command->payload()['new']['name']
         );
 
         $budget->editPosition($oldPositionData, $newPositionData);

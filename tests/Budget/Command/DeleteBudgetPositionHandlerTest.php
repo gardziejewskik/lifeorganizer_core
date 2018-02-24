@@ -2,13 +2,11 @@
 
 namespace Test\Budget\Command;
 
-use LifeOrganizer\Core\Budget\BudgetRepository;
-use LifeOrganizer\Core\Budget\Command\AddBudgetPosition;
-use LifeOrganizer\Core\Budget\Command\AddBudgetPositionHandler;
 use LifeOrganizer\Core\Budget\Command\DeleteBudgetPosition;
 use LifeOrganizer\Core\Budget\Command\DeleteBudgetPositionHandler;
+use LifeOrganizer\Core\Budget\InMemoryBudgetRepository;
 use LifeOrganizer\Core\Budget\Model\Budget;
-use LifeOrganizer\Core\Category\Category;
+use LifeOrganizer\Core\Budget\ValueObject\PositionDetails;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
@@ -22,39 +20,29 @@ class DeleteBudgetPositionHandlerTest extends TestCase
     public function whenCommandWasHandledPositionWasAddedToBudget()
     {
         $budgetUuid = '6dc74fd3-42e5-4b9e-a5c1-0ef720136881';
-        $addCommand = new AddBudgetPosition(
-            123,
-            'PLN',
-            $budgetUuid,
-            'fancyName'
-        );
         $deleteCommand = new DeleteBudgetPosition(
             123,
             'PLN',
             $budgetUuid,
             'fancyName'
         );
-        $budget = Budget::createWithData(
-            $budgetUuid,
-            'testBudget',
-            'someId',
-            new Category('1', '1'),
-            new Money(123, new Currency('PLN'))
-        );
+        $budget = $this->getMockBuilder(Budget::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $budget->method('id')->willReturn($budgetUuid);
+        $budget->method('deleted')->willReturn(false);
+        $budget->expects($this->once())
+            ->method('deletePosition')
+            ->with(
+                new PositionDetails(
+                    $budgetUuid,
+                    new Money(123, new Currency('PLN')),
+                    'fancyName'
+                )
+            );
+        $budgetRepository = new InMemoryBudgetRepository([$budget]);
+        $deleteHandler = new DeleteBudgetPositionHandler($budgetRepository);
 
-        $budgetRepositoryMock = $this->createMock(
-            BudgetRepository::class
-        );
-        $budgetRepositoryMock->method('getById')
-            ->willReturn($budget);
-
-        /** @var BudgetRepository $budgetRepositoryMock */
-        $addHandler = new AddBudgetPositionHandler($budgetRepositoryMock);
-        $deleteHandler = new DeleteBudgetPositionHandler($budgetRepositoryMock);
-
-        $addHandler($addCommand);
         $deleteHandler($deleteCommand);
-
-        $this->assertEquals(0, count($budget->positions()));
     }
 }
