@@ -8,6 +8,7 @@ use LifeOrganizer\Core\Budget\Event\NameChanged;
 use LifeOrganizer\Core\Budget\Event\PositionAdded;
 use LifeOrganizer\Core\Budget\Event\PositionDeleted;
 use LifeOrganizer\Core\Budget\Event\PositionEdited;
+use LifeOrganizer\Core\Budget\Exception\UnsupportedEvent;
 use LifeOrganizer\Core\Budget\ValueObject\PositionDetails;
 use LifeOrganizer\Core\Category\Category;
 use Money\Currency;

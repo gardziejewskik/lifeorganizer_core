@@ -30,8 +30,7 @@ class InMemoryBudgetRepository implements BudgetRepository, Countable
     public function getById(
         string $id,
         array $options = ['deleted' => false]
-    ): Budget
-    {
+    ): Budget {
         $data = array_filter($this->budgets, function($budget) use ($id, $options) {
             /** @var Budget $budget */
             return $budget->id() === $id
