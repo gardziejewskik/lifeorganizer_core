@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Test\Budget\Model;
 
@@ -50,15 +50,15 @@ class BudgetTest extends TestCase
     /**
      * @test
      * @dataProvider positionValueAndExpectedBudgetValue
-     * @param int[] $positionsValue
+     * @param int[] $positionsValues
      * @param int $expectedValue
      */
     public function whenPositionIsAddedToBudgetThenBudgetValueIsChanged(
-        array $positionsValue, int $expectedValue
+        array $positionsValues, int $expectedValue
     ) {
         $budget = $this->createBudget();
 
-        foreach ($positionsValue as $positionValue) {
+        foreach ($positionsValues as $positionValue) {
             $budget->addPosition(
                 new PositionDetails(
                     'bc912b21-8b0b-4635-82df-f74a09fd69e1',
@@ -72,6 +72,32 @@ class BudgetTest extends TestCase
         $this->assertTrue($expectedMoney->equals($budget->value()));
     }
 
+    public function positionValueAndExpectedBudgetValue(): array
+    {
+        return [
+            [
+                [ 123, -123 ],
+                0
+            ],
+            [
+                [ -123, 123 ],
+                0
+            ],
+            [
+                [ -123, 123, 123 ],
+                123
+            ],
+            [
+                [ -123, 123, -123 ],
+                -123
+            ],
+            [
+                [ -123, 123, 123, 123 ],
+                246
+            ]
+        ];
+    }
+
     private function createBudget(): Budget
     {
         return Budget::createWithData(
@@ -81,31 +107,5 @@ class BudgetTest extends TestCase
             new Category('1', '1'),
             new Money(123, new Currency('PLN'))
         );
-    }
-
-    public function positionValueAndExpectedBudgetValue(): array
-    {
-        return [
-            [
-                [ 123, -123],
-                0
-            ],
-            [
-                [ -123, 123],
-                0
-            ],
-            [
-                [ -123, 123, 123],
-                123
-            ],
-            [
-                [ -123, 123, -123],
-                -123
-            ],
-            [
-                [ -123, 123, 123, 123],
-                246
-            ]
-        ];
     }
 }
