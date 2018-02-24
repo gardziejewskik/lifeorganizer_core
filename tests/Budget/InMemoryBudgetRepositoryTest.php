@@ -79,6 +79,24 @@ class InMemoryBudgetRepositoryTest extends TestCase
     /**
      * @test
      */
+    public function whenTryGetDeletedBudgetWithDeclaredOptionThenShouldBeReturned(): void
+    {
+        $budget = $this->inMemoryBudgetRepository->getById(
+            'bc912b21-8b0b-4635-82df-f74a09fd68i0',
+            [
+                'deleted' => true
+            ]
+        );
+
+        $this->assertSame(
+            'bc912b21-8b0b-4635-82df-f74a09fd68i0',
+            $budget->id()
+        );
+    }
+
+    /**
+     * @test
+     */
     public function whenTryGetDeletedBudgetFromRepositoryThenExceptionThrows()
     {
         $this->expectException(BudgetDoesNotExist::class);

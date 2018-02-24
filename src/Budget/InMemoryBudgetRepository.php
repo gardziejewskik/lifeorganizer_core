@@ -32,9 +32,10 @@ class InMemoryBudgetRepository implements BudgetRepository, Countable
         array $options = ['deleted' => false]
     ): Budget
     {
-        $data = array_filter($this->budgets, function($budget) use ($id) {
+        $data = array_filter($this->budgets, function($budget) use ($id, $options) {
             /** @var Budget $budget */
-            return $budget->id() === $id && !$budget->deleted();
+            return $budget->id() === $id
+                && $budget->deleted() === $options['deleted'];
         });
 
         if (empty($data)) {
